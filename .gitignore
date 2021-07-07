@@ -1,2 +1,7 @@
 *.gem
 .DS_Store
+lib/pyroscope_c.bundle
+/build
+/pkg
+/ext/pyroscope/lib/*.a
+/ext/pyroscope/lib/*.bundle
