@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.require_paths << "ext/pyroscope"
   s.extensions    << "ext/pyroscope/extconf.rb"
 
+  s.add_development_dependency "bundler"
   s.add_development_dependency "rake"
   s.add_development_dependency "rake-compiler"
   s.add_development_dependency "rubygems-tasks"

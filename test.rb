@@ -1,10 +1,11 @@
 require 'pyroscope'
 
-# puts Pyroscope::Greeting.new("test").hello
-
-# puts Pyroscope.methods
 puts "prestart #{Process.pid}"
-Pyroscope.start("test.ruby.app", Process.pid, "rbspy", "http://localhost:4040/")
+
+Pyroscope.configure do |config|
+  config.app_name = "test.app.ruby.cpu"
+  config.server_address = "http://localhost:4040/"
+end
 
 puts "start"
 i=0

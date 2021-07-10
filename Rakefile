@@ -4,6 +4,7 @@ require "rake/extensiontask"
 require "rake/testtask"
 require "rspec/core/rake_task"
 require "rake/clean"
+require_relative "./lib/pyroscope/version"
 
 CLEAN.include(
   "ext/pyroscope/*.o",
@@ -41,5 +42,9 @@ task :build   => [:clean, :compile]
 task :default => [:build, :spec]
 
 task :test do
-  system "rake build && gem install pkg/pyroscope-0.0.1.gem && sudo -E ruby test.rb"
+  system "rake build && gem install pkg/pyroscope-#{Pyroscope::VERSION}.gem && sudo -E ruby test.rb"
+end
+
+task :publish do
+  system "rake publish pkg/pyroscope-#{Pyroscope::VERSION}.gem"
 end

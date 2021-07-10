@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pyroscope (0.0.1)
+    pyroscope (0.0.2)
 
 GEM
   remote: https://rubygems.org/
@@ -36,6 +36,7 @@ PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
+  bundler
   pyroscope!
   rake
   rake-compiler
