@@ -1,5 +1,5 @@
 require "pyroscope/version"
-require_relative "./pyroscope_c"
+require "pyroscope_c"
 
 module Pyroscope
   Config = Struct.new(:app_name, :server_address)
@@ -14,7 +14,11 @@ module Pyroscope
     )
   end
 
-  def stop
+  def self.stop
     _stop(Process.pid)
+  end
+
+  def self.change_name(new_name)
+    _change_name(new_name)
   end
 end

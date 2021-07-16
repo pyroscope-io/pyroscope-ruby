@@ -46,5 +46,5 @@ task :test do
 end
 
 task :publish do
-  system "rake publish pkg/pyroscope-#{Pyroscope::VERSION}.gem"
+  system "rake build && gem install pkg/pyroscope-#{Pyroscope::VERSION}.gem && gem push pkg/pyroscope-#{Pyroscope::VERSION}.gem"
 end
