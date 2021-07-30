@@ -42,7 +42,21 @@ task :build   => [:clean, :compile]
 task :default => [:build, :spec]
 
 task :test do
-  system "rake build && gem install pkg/pyroscope-#{Pyroscope::VERSION}.gem && sudo -E ruby test.rb"
+  # system "rsync -a /home/dmitry/rbspy/ /home/dmitry/pyroscope/third_party/local-clones/rbspy"
+  # # system "cd ../pyroscope && DOCKER_BUILDKIT=1 docker build -f Dockerfile.static-libs --output type=local,dest=out ." if RUBY_PLATFORM.include?("linux")
+  # system "cd ../pyroscope && rm out/*.a"
+  # system "cd ../pyroscope && ENABLED_SPIES=rbspy make build-rust-dependencies"
+  # system "cd ../pyroscope && make build-rbspy-static-library"
+  # system "cd ../pyroscope && cp third_party/rustdeps/target/x86_64-unknown-linux-gnu/release/librustdeps.a ./out/librustdeps.a"
+  extra_env = "PYROSCOPE_RUBY_LOCAL=1"
+  extra_env = ""
+
+  system "#{extra_env} rake build && #{extra_env} sudo -E gem install pkg/pyroscope-#{Pyroscope::VERSION}.gem && sudo -E ruby test.rb"
+end
+
+task :test_exec do
+  # system "cd ../pyroscope && DOCKER_BUILDKIT=1 docker build -f Dockerfile.static-libs --output type=local,dest=out ." if RUBY_PLATFORM.include?("linux")
+  system "sudo -E pyroscope exec ruby test.rb"
 end
 
 task :publish do

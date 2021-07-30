@@ -8,7 +8,7 @@ static VALUE rb_Pyroscope;
 
 int Start(char*, int, char*, char*);
 int Stop(int);
-int ChangeName(char*);
+int ChangeName(char*, int);
 
 static VALUE
 pyroscope_start(VALUE self, VALUE appName, VALUE pid, VALUE serverAddress) {
@@ -33,10 +33,12 @@ pyroscope_stop(VALUE self, VALUE pid) {
 }
 
 static VALUE
-pyroscope_change_name(VALUE self, VALUE appName) {
+pyroscope_change_name(VALUE self, VALUE appName, VALUE pid) {
   VALUE r_appName = StringValue(appName);
   char *c_appName = RSTRING_PTR(r_appName);
-  int res = ChangeName(c_appName);
+  int c_pid = FIX2INT(pid);
+
+  int res = ChangeName(c_appName, c_pid);
   return INT2FIX(res);
 }
 
@@ -45,5 +47,5 @@ Init_pyroscope_c() {
   rb_Pyroscope = rb_define_module("Pyroscope");
   rb_define_module_function(rb_Pyroscope, "_start", pyroscope_start, 3);
   rb_define_module_function(rb_Pyroscope, "_stop", pyroscope_stop, 1);
-  rb_define_module_function(rb_Pyroscope, "_change_name", pyroscope_change_name, 1);
+  rb_define_module_function(rb_Pyroscope, "_change_name", pyroscope_change_name, 2);
 }

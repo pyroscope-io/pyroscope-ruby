@@ -19,6 +19,6 @@ module Pyroscope
   end
 
   def self.change_name(new_name)
-    _change_name(new_name)
+    _change_name(new_name, Process.pid)
   end
 end
