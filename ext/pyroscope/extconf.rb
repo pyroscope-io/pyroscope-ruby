@@ -9,7 +9,7 @@ HEADER_DIRS = [INCLUDEDIR]
 
 LIB_DIRS = [LIBDIR, File.expand_path(File.join(File.dirname(__FILE__), "lib"))]
 
-COMMIT = "a263249"
+COMMIT = "e2afa55"
 
 # TODO: this is not very accurate, but it works for now
 OS = RUBY_PLATFORM.include?("darwin") ? "mac" : "linux"
@@ -21,11 +21,13 @@ ROOT = File.expand_path("..", __FILE__)
 
 if ENV["PYROSCOPE_RUBY_LOCAL"]
   puts "PYROSCOPE_RUBY_LOCAL yes"
+  system "cd #{ENV["HOME"]}/pyroscope && make build-rust-dependencies-docker"
   system "cp #{ENV["HOME"]}/pyroscope/out/libpyroscope.rbspy.a #{File.join(ROOT, "lib/libpyroscope.rbspy.a")}"
   system "cp #{ENV["HOME"]}/pyroscope/out/librustdeps.a #{File.join(ROOT, "lib/librustdeps.a")}"
 else
   Net::HTTP.start("dl.pyroscope.io", 443, :use_ssl => true) do |http|
     ["libpyroscope.rbspy.a", "librustdeps.a"].each do |name|
+      url = PREFIX+"/#{name}.gz"
       req = Net::HTTP::Get.new(url)
       http.request(req) do |resp|
         raise "HTTP error: #{resp.code}" unless resp.code == "200"

@@ -11,6 +11,15 @@ puts "start"
 iteration=0
 st = Time.new
 
+puts "Pyroscope.test_logger 1"
+Pyroscope.test_logger
+Pyroscope.set_logger_level(:info)
+puts "Pyroscope.test_logger 2"
+Pyroscope.test_logger
+
+puts "build_summary:"
+puts Pyroscope.build_summary
+
 def work(n)
   i = 0
   while i < n
@@ -35,6 +44,9 @@ while true
   iteration+=1
 
   r = rand
+  # if r > 0.9
+  #   Pyroscope.set_logger_level(:test)
+  # end
   if r < 0.1
     sleep_job
   elsif r < 0.5

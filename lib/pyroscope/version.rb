@@ -1,3 +1,3 @@
 module Pyroscope
-  VERSION = "0.0.13".freeze
+  VERSION = "0.0.21".freeze
 end
