@@ -9,7 +9,7 @@ HEADER_DIRS = [INCLUDEDIR]
 
 LIB_DIRS = [LIBDIR, File.expand_path(File.join(File.dirname(__FILE__), "lib"))]
 
-COMMIT = "24effc7"
+COMMIT = "df45c48"
 
 # TODO: this is not very accurate, but it works for now
 OS = RUBY_PLATFORM.include?("darwin") ? "mac" : "linux"
@@ -19,23 +19,55 @@ PREFIX = "/static-libs/#{COMMIT}/#{OS}-#{ARCH}"
 
 ROOT = File.expand_path("..", __FILE__)
 
-Net::HTTP.start("dl.pyroscope.io", 443, :use_ssl => true) do |http|
-  res1 = http.get(PREFIX+"/libpyroscope.rbspy.a")
-  raise "HTTP error: #{res1.code}" unless res1.code == "200"
-  lib1 = res1.body
-  File.binwrite(File.join(ROOT, "lib/libpyroscope.rbspy.a"), lib1)
-
-  res2 = http.get(PREFIX+"/librustdeps.a")
-  raise "HTTP error: #{res2.code}" unless res2.code == "200"
-  lib2 = res2.body
-  File.binwrite(File.join(ROOT, "lib/librustdeps.a"), lib2)
+def run(str)
+  system(str) || fail("command failed: #{str}")
 end
 
-# TODO: figure out how to fix this bug
-system "strip --strip-debug #{File.join(ROOT, "lib/libpyroscope.rbspy.a")}"
+if ENV["PYROSCOPE_RUBY_LOCAL"]
+  puts "PYROSCOPE_RUBY_LOCAL yes"
+  # TODO: make configurable
+  pyroscope_path = "#{ENV["HOME"]}/pyroscope"
+  run("rm -rf #{File.join(ROOT, "build")}")
+  run("cd #{pyroscope_path} && make build-rust-dependencies-docker")
+  run("cp #{pyroscope_path}/out/libpyroscope.rbspy.a #{File.join(ROOT, "lib/libpyroscope.rbspy.a")}")
+  run("cp #{pyroscope_path}/out/librustdeps.a #{File.join(ROOT, "lib/librustdeps.a")}")
+else
+  Net::HTTP.start("dl.pyroscope.io", 443, :use_ssl => true) do |http|
+    ["libpyroscope.rbspy.a", "librustdeps.a"].each do |name|
+      url = PREFIX+"/#{name}.gz"
+      req = Net::HTTP::Get.new(url)
+      http.request(req) do |resp|
+        raise "HTTP error: #{resp.code}" unless resp.code == "200"
 
-# system "cp /Users/dmitry/Dev/ps/pyroscope/out/libpyroscope.rbspy.a #{File.join(ROOT, "lib/libpyroscope.rbspy.a")}"
-# system "cp /Users/dmitry/Dev/ps/pyroscope/third_party/rustdeps/target/release/librustdeps.a #{File.join(ROOT, "lib/librustdeps.a")}"
+        r, w = IO.pipe
+
+        t = Thread.new do
+          zreader = Zlib::GzipReader.new(r)
+          File.open(File.join(ROOT, "lib/#{name}"), "wb") do |f|
+            loop do
+              begin
+                chunk = zreader.readpartial(32768)
+                break if chunk.nil?
+              rescue EOFError
+                break
+              end
+              f.write(chunk)
+            end
+          end
+        end
+
+        resp.read_body do |chunk|
+          w.write(chunk)
+        end
+
+        t.join
+      end
+    end
+  end
+end
+
+# this is now done upstream
+# system "strip --strip-debug #{File.join(ROOT, "lib/libpyroscope.rbspy.combo.a")}"
 
 dir_config('pyroscope', HEADER_DIRS, LIB_DIRS)
 

@@ -1,21 +1,32 @@
-require 'pyroscope'
-
-puts "prestart #{Process.pid}"
+require "pyroscope"
 
 Pyroscope.configure do |config|
-  config.app_name = "test.app.ruby2.cpu{}"
-  config.server_address = "http://localhost:4040/"
+  config.app_name = "test.ruby.app"
+  config.server_address = "http://pyroscope:4040/"
+  config.tags = {
+    :region => "us-east-1",
+    :hostname => ENV["hostname"]
+  }
 end
 
-puts "start"
-i=0
-st = Time.new
-while true
-  i+=1
-  # puts Time.new - st
-  if Time.new - st > 5
-    puts "new name " + "test.app.ruby2.cpu{iteration=#{i}}"
-    Pyroscope.change_name("test.app.ruby2.cpu{iteration=#{i}}")
-    st = Time.new
+def work(n)
+  i = 0
+  while i < n
+    i += 1
   end
+end
+
+def fast_function
+  work(20000)
+end
+
+def slow_function
+  work(80000)
+end
+
+Pyroscope.tag({ "region" => "us-east-1" })
+
+while true
+  fast_function
+  slow_function
 end

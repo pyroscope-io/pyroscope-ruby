@@ -42,7 +42,13 @@ task :build   => [:clean, :compile]
 task :default => [:build, :spec]
 
 task :test do
-  system "rake build && gem install pkg/pyroscope-#{Pyroscope::VERSION}.gem && sudo -E ruby test.rb"
+  sudo = RUBY_PLATFORM =~ /darwin/ ? "sudo -E" : ""
+  system "rake build && #{sudo} gem install pkg/pyroscope-#{Pyroscope::VERSION}.gem && #{sudo} ruby test.rb"
+end
+
+task :test_exec do
+  # system "cd ../pyroscope && DOCKER_BUILDKIT=1 docker build -f Dockerfile.static-libs --output type=local,dest=out ." if RUBY_PLATFORM.include?("linux")
+  system "sudo -E pyroscope exec ruby test.rb"
 end
 
 task :publish do
