@@ -42,7 +42,6 @@ task :build   => [:clean, :compile]
 task :default => [:build, :spec]
 
 task :test do
-  system "cd ../pyroscope && ENABLED_SPIES=rbspy make build-rust-dependencies"
   sudo = RUBY_PLATFORM =~ /darwin/ ? "sudo -E" : ""
   system "rake build && #{sudo} gem install pkg/pyroscope-#{Pyroscope::VERSION}.gem && #{sudo} ruby test.rb"
 end

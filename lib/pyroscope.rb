@@ -2,14 +2,13 @@ require "pyroscope/version"
 require "pyroscope_c"
 
 module Pyroscope
-  Config = Struct.new(:app_name, :server_address, :auth_token, :sample_rate, :with_subprocesses, :log_level)
+  Config = Struct.new(:app_name, :server_address, :auth_token, :sample_rate, :with_subprocesses, :log_level, :tags)
 
   class << self
     def configure
       @configuration = Config.new
       yield @configuration
       _start(
-        Process.pid,
         @configuration.app_name,
         @configuration.server_address,
         @configuration.auth_token || "",
@@ -17,31 +16,41 @@ module Pyroscope
         @configuration.with_subprocesses || 0,
         @configuration.log_level || "error",
       )
+      tag(@configuration.tags) if @configuration.tags
     end
 
     def stop
-      _stop(Process.pid)
+      _stop
     end
 
     def change_name(new_name)
-      _change_name(Process.pid, new_name)
+      _change_name(new_name)
     end
 
-    def set_tag(key, val)
-      _set_tag(Process.pid, key, val)
+    def tag_wrapper(tags)
+      tag(tags)
+
+      begin
+        yield
+      ensure
+        remove_tags(*tags.keys)
+      end
     end
 
-    def test_logger()
+    def tag(tags)
+      tags.each_pair do |key, val|
+        _set_tag(key.to_s, val.to_s)
+      end
+    end
+
+    def remove_tags(*keys)
+      keys.each do |key|
+        _set_tag(key.to_s, "")
+      end
+    end
+
+    def test_logger
       _test_logger
-    end
-
-    VALID_LOG_LEVELS = %i[none error info debug]
-
-    def set_logger_level(level)
-      i = VALID_LOG_LEVELS.index(level)
-      raise "Unknown log level (#{level.inspect}), valid values are #{VALID_LOG_LEVELS.inspect}" unless i
-
-      _set_logger_level(i - 1)
     end
 
     def build_summary
