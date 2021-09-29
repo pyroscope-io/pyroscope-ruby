@@ -4,7 +4,7 @@
 [Pyroscope](https://github.com/pyroscope-io/pyroscope) is a tool that lets you continuously profile your applications to prevent and debug performance issues in your code. It consists of a low-overhead agent which sends data to the Pyroscope server which includes a custom-built storage engine. This allows for you to store and query any applications profiling data in an extremely efficient and cost effective way. 
 
 
-### How to install Pyroscope for Python Applications
+### How to install Pyroscope for Ruby Applications
 Adding Pyroscope to your Gemfile
 ```
 bundle add pyroscope
