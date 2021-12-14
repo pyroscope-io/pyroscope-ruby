@@ -24,9 +24,8 @@ def run(str)
 end
 
 if ENV["PYROSCOPE_RUBY_LOCAL"]
-  puts "PYROSCOPE_RUBY_LOCAL yes"
-  # TODO: make configurable
-  pyroscope_path = "#{ENV["HOME"]}/pyroscope"
+  puts "PYROSCOPE_RUBY_LOCAL using path #{ENV['PYROSCOPE_RUBY_LOCAL']}}"
+  pyroscope_path = ENV["PYROSCOPE_RUBY_LOCAL"]
   run("rm -rf #{File.join(ROOT, "build")}")
   run("cd #{pyroscope_path} && make build-rust-dependencies-docker")
   run("cp #{pyroscope_path}/out/libpyroscope.rbspy.a #{File.join(ROOT, "lib/libpyroscope.rbspy.a")}")
