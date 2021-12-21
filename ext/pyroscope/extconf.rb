@@ -9,7 +9,7 @@ HEADER_DIRS = [INCLUDEDIR]
 
 LIB_DIRS = [LIBDIR, File.expand_path(File.join(File.dirname(__FILE__), "lib"))]
 
-COMMIT = "df45c48"
+COMMIT = "e44f13d9"
 
 # TODO: this is not very accurate, but it works for now
 OS = RUBY_PLATFORM.include?("darwin") ? "mac" : "linux"
